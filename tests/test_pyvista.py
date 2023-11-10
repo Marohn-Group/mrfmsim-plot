@@ -11,9 +11,9 @@ def test_create_imagedata(dataset, grid):
     """
     image_data = create_imagedata(dataset, grid)
 
-    assert np.array_equal(image_data.dimensions, grid.grid_shape)
+    assert np.array_equal(image_data.dimensions, grid.shape)
     # assert np.array_equal(image_data.origin, grid.grid_origin)
-    assert np.array_equal(image_data.spacing, grid.grid_step)
+    assert np.array_equal(image_data.spacing, grid.step)
     assert np.array_equal(image_data.point_data["values"], dataset.flatten(order="F"))
 
     full_grid_array = np.broadcast_arrays(*grid.grid_array)

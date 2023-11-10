@@ -19,7 +19,7 @@ def image_plane(dataset, grid, colormap=None, *args, **kwargs):
         dataset are not equal
     """
 
-    extent = grid.grid_extents(grid.grid_range, grid.grid_origin).ravel()
+    extent = grid.extents.ravel()
     grid_array_full = np.broadcast_arrays(*grid.grid_array)
 
     mlab.figure(size=(600, 600))
@@ -28,7 +28,7 @@ def image_plane(dataset, grid, colormap=None, *args, **kwargs):
         mlab.pipeline.image_plane_widget(
             vtk_dataset,
             plane_orientation=orientation,
-            slice_index=grid.grid_shape[i] / 2,
+            slice_index=grid.shape[i] / 2,
             colormap=colormap or "jet",
         )
     mlab.outline()

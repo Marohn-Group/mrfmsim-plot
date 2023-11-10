@@ -10,12 +10,10 @@ def create_imagedata(dataset, grid):
     (southwest corner) of the grid.
     """
 
-    extents = grid.grid_extents(grid.grid_range, grid.grid_origin)
-
     image_data = pv.ImageData()
-    image_data.dimensions = grid.grid_shape
-    image_data.origin = [extents[0][0], extents[1][0], extents[2][0]]
-    image_data.spacing = grid.grid_step
+    image_data.dimensions = grid.shape
+    image_data.origin = [grid.extents[0][0], grid.extents[1][0], grid.extents[2][0]]
+    image_data.spacing = grid.step
 
     # pyvsita sets the grid up as the F order, different from the mgrid
     # default generation
@@ -24,7 +22,22 @@ def create_imagedata(dataset, grid):
     return image_data
 
 
-def mesh_clip_plane(dataset, grid, *args, **kwargs):
+def mesh(dataset, grid, off_screen=False, **kwargs):
+    """Create mesh plot from pyvista.
+
+    The function takes the numpy array and the grid information.
+    The function converts the numpy array into a vtk object, and
+    uses the grid array to scale the plot axis.
+    """
+    image_data = create_imagedata(dataset, grid)
+
+    p = pv.Plotter(off_screen=off_screen)
+    p.add_mesh(image_data, **kwargs)
+
+    return p
+
+
+def mesh_clip_plane(dataset, grid, off_screen=False, **kwargs):
     """Create mesh clip plane plot from pyvista.
 
     The function takes the numpy array and the grid information.
@@ -33,16 +46,14 @@ def mesh_clip_plane(dataset, grid, *args, **kwargs):
     """
     image_data = create_imagedata(dataset, grid)
 
-    p = pv.Plotter()
-    p.add_mesh_clip_plane(image_data)
+    p = pv.Plotter(off_screen=off_screen)
+    p.add_mesh_clip_plane(image_data, **kwargs)
 
     return p
 
 
-def transparent_volume(
-    dataset, grid, opacity, opacity_unit_distance, colormap=None, *args, **kwargs
-):
-    """Create a transparent volume plot from pyvista.
+def volume(dataset, grid, off_screen=False, **kwargs):
+    """Create a volume plot from pyvista.
 
     The function takes the numpy array and the grid information.
     The function converts the numpy array into a vtk object, and
@@ -50,12 +61,17 @@ def transparent_volume(
     """
     image_data = create_imagedata(dataset, grid)
 
-    p = pv.Plotter()
-    p.add_volume(
-        image_data,
-        opacity=opacity,
-        opacity_unit_distance=opacity_unit_distance,
-        cmap=colormap or "jet",
-    )
+    p = pv.Plotter(off_screen=off_screen)
+    p.add_volume(image_data, **kwargs)
+
+    return p
+
+
+def volume_clip_plane(dataset, grid, off_screen=False, **kwargs):
+    """Create a volume clip plane plot from pyvista."""
+    image_data = create_imagedata(dataset, grid)
+
+    p = pv.Plotter(off_screen=off_screen)
+    p.add_volume_clip_plane(image_data, **kwargs)
 
     return p

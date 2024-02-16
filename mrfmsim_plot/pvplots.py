@@ -1,10 +1,10 @@
 import pyvista as pv
 
 
-def create_imagedata(dataset, grid):
-    """Create a pyvista ImageData object from a numpy array and its grid.
+def pv_imagedata(dataset, grid, name="data"):
+    """Create a PyVista ImageData object from a numpy array and its grid.
 
-    The origin of the pyvista object is not the same as the grid origin.
+    The origin of the PyVista object is not the same as the grid origin.
     In mrfmsim, the grid origin is defined as the middle of the grid.
     In pyvista plots, the origin is defined as the lower left corner
     (southwest corner) of the grid.
@@ -17,61 +17,89 @@ def create_imagedata(dataset, grid):
 
     # pyvsita sets the grid up as the F order, different from the mgrid
     # default generation
-    image_data.point_data["values"] = dataset.flatten(order="F")
+    image_data.point_data[name] = dataset.flatten(order="F")
 
     return image_data
 
 
-def mesh(dataset, grid, off_screen=False, **kwargs):
-    """Create mesh plot from pyvista.
-
-    The function takes the numpy array and the grid information.
-    The function converts the numpy array into a vtk object, and
-    uses the grid array to scale the plot axis.
+def save_pvplot(data, method, filename, **kwargs):
+    """Create a PyVista plot and save it to a file.
+    
+    :param np.array data: the data to plot
+    :param str method: the method to use for plotting
+    :param str filename: the filename to save the plot
+    :param kwargs: additional arguments for the method
     """
-    image_data = create_imagedata(dataset, grid)
 
-    p = pv.Plotter(off_screen=off_screen)
-    p.add_mesh(image_data, **kwargs)
+    p = pv.Plotter(off_screen=True)
+    getattr(p, method)(data, **kwargs)
+    p.screenshot(filename)
+    p.close()
 
-    return p
 
-
-def mesh_clip_plane(dataset, grid, off_screen=False, **kwargs):
-    """Create mesh clip plane plot from pyvista.
-
-    The function takes the numpy array and the grid information.
-    The function converts the numpy array into a vtk object, and
-    uses the grid array to scale the plot axis.
+def show_pvplot(data, method, **kwargs):
+    """Create a PyVista plot and display it.
+    
+    :param np.array data: the data to plot
+    :param str method: the method to use for plotting
+    :param kwargs: additional arguments for the method
     """
-    image_data = create_imagedata(dataset, grid)
 
-    p = pv.Plotter(off_screen=off_screen)
-    p.add_mesh_clip_plane(image_data, **kwargs)
-
-    return p
+    p = pv.Plotter(off_screen=False)
+    getattr(p, method)(data, **kwargs)
+    p.show()
 
 
-def volume(dataset, grid, off_screen=False, **kwargs):
-    """Create a volume plot from pyvista.
+# def mesh(dataset, grid, off_screen=False, **kwargs):
+#     """Create mesh plot from PyVista.
 
-    The function takes the numpy array and the grid information.
-    The function converts the numpy array into a vtk object, and
-    uses the grid array to scale the plot axis.
-    """
-    image_data = create_imagedata(dataset, grid)
+#     The function takes the numpy array and the grid information.
+#     The function converts the numpy array into a VTK object, and
+#     uses the grid array to scale the plot axis.
+#     """
+#     image_data = create_imagedata(dataset, grid)
 
-    p = pv.Plotter(off_screen=off_screen)
-    p.add_volume(image_data, **kwargs)
+#     p = pv.Plotter(off_screen=off_screen)
+#     p.add_mesh(image_data, **kwargs)
 
-    return p
+#     return p
 
 
-def volume_clip_plane(dataset, grid, off_screen=False, **kwargs):
-    """Create a volume clip plane plot from pyvista."""
-    image_data = create_imagedata(dataset, grid)
+# def mesh_clip_plane(dataset, grid, off_screen=False, **kwargs):
+#     """Create mesh clip plane plot from PyVista.
 
-    p = pv.Plotter(off_screen=off_screen)
-    p.add_volume_clip_plane(image_data, **kwargs)
+#     The function takes the numpy array and the grid information.
+#     The function converts the numpy array into a vtk object, and
+#     uses the grid array to scale the plot axis.
+#     """
+#     image_data = create_imagedata(dataset, grid)
 
-    return p
+#     p = pv.Plotter(off_screen=off_screen)
+#     p.add_mesh_clip_plane(image_data, **kwargs)
+
+#     return p
+
+
+# def volume(dataset, grid, off_screen=False, **kwargs):
+#     """Create a volume plot from PyVista.
+
+#     The function takes the numpy array and the grid information.
+#     The function converts the numpy array into a vtk object, and
+#     uses the grid array to scale the plot axis.
+#     """
+#     image_data = create_imagedata(dataset, grid)
+
+#     p = pv.Plotter(off_screen=off_screen)
+#     p.add_volume(image_data, **kwargs)
+
+#     return p
+
+
+# def volume_clip_plane(dataset, grid, off_screen=False, **kwargs):
+#     """Create a volume clip plane plot from pyvista."""
+#     image_data = create_imagedata(dataset, grid)
+
+#     p = pv.Plotter(off_screen=off_screen)
+#     p.add_volume_clip_plane(image_data, **kwargs)
+
+#     return p

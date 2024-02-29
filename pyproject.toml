@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mrfmsim-plot"
-version = "0.0.1"
+version = "0.1.0"
 description = "Plotting functions for magnetic resonance force microscopy experiments"
 authors = ["Peter Sun <hs859@cornell.edu>"]
 maintainers = ["Peter Sun <hs859@cornell.edu>"]
@@ -12,6 +12,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10"
+# vtk >= 9.2.6 see readme for installation
 mrfmsim = { git = "https://github.com/marohn-group/mrfmsim", branch="develop" }
 mayavi = ">=4.7.2"
 pyside6 = ">=6.1.0"
@@ -39,13 +40,6 @@ plot = "mrfmsim_plot"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    # note the use of single quote below to denote "raw" strings in TOML
-    # the escape sequence is necessary in graphviz dot string
-    # used to left align node text
-    'ignore:invalid escape sequence \\l:DeprecationWarning',
-    # The parallel method of numba might not be used in test
-    # ignore the warning
-    'ignore::numba.NumbaPerformanceWarning',
     # the plot plugin's mayavi package has a deprecation warning
     'ignore::DeprecationWarning',
 ]

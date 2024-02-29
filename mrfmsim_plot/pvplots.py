@@ -17,89 +17,42 @@ def pv_imagedata(dataset, grid, name="data"):
 
     # pyvsita sets the grid up as the F order, different from the mgrid
     # default generation
-    image_data.point_data[name] = dataset.flatten(order="F")
+    image_data[name] = dataset.flatten(order="F")
 
     return image_data
 
 
-def save_pvplot(data, method, filename, **kwargs):
-    """Create a PyVista plot and save it to a file.
+def pv_volume(dataset, grid, name="data", background_color="white", **kwargs):
+    """Create a PyVista volume plot object.
     
-    :param np.array data: the data to plot
-    :param str method: the method to use for plotting
-    :param str filename: the filename to save the plot
-    :param kwargs: additional arguments for the method
+    :param np.array dataset: the dataset to plot
+    :param np.array grid: the grid of the dataset
+    :param str name: the name of the dataset
+    :param str background_color: the background color of the plot
+    :param kwargs: additional keyword arguments to pass to the add_volume method
+    """
+    image_data = pv_imagedata(dataset, grid, name)
+    p = pv.Plotter()
+    p.add_volume(image_data, **kwargs)
+    p.background_color = background_color
+    p.add_axes()
+    return p
+
+
+
+def pv_save(func):
+    """Decorator to save the plot to a file directly.
+    
+    A decorator is used because the offscreen option needs to be set before the
+    pyvista object is created. The decorator adds a keyword filename argument
+    to the plotting function.
     """
 
-    p = pv.Plotter(off_screen=True)
-    getattr(p, method)(data, **kwargs)
-    p.screenshot(filename)
-    p.close()
+    def wrapper(*args, filename, **kwargs):
+        pv.OFF_SCREEN = True
+        p = func(*args, **kwargs)
+        p.screenshot(filename)
+        p.close()
+        pv.OFF_SCREEN = False
 
-
-def show_pvplot(data, method, **kwargs):
-    """Create a PyVista plot and display it.
-    
-    :param np.array data: the data to plot
-    :param str method: the method to use for plotting
-    :param kwargs: additional arguments for the method
-    """
-
-    p = pv.Plotter(off_screen=False)
-    getattr(p, method)(data, **kwargs)
-    p.show()
-
-
-# def mesh(dataset, grid, off_screen=False, **kwargs):
-#     """Create mesh plot from PyVista.
-
-#     The function takes the numpy array and the grid information.
-#     The function converts the numpy array into a VTK object, and
-#     uses the grid array to scale the plot axis.
-#     """
-#     image_data = create_imagedata(dataset, grid)
-
-#     p = pv.Plotter(off_screen=off_screen)
-#     p.add_mesh(image_data, **kwargs)
-
-#     return p
-
-
-# def mesh_clip_plane(dataset, grid, off_screen=False, **kwargs):
-#     """Create mesh clip plane plot from PyVista.
-
-#     The function takes the numpy array and the grid information.
-#     The function converts the numpy array into a vtk object, and
-#     uses the grid array to scale the plot axis.
-#     """
-#     image_data = create_imagedata(dataset, grid)
-
-#     p = pv.Plotter(off_screen=off_screen)
-#     p.add_mesh_clip_plane(image_data, **kwargs)
-
-#     return p
-
-
-# def volume(dataset, grid, off_screen=False, **kwargs):
-#     """Create a volume plot from PyVista.
-
-#     The function takes the numpy array and the grid information.
-#     The function converts the numpy array into a vtk object, and
-#     uses the grid array to scale the plot axis.
-#     """
-#     image_data = create_imagedata(dataset, grid)
-
-#     p = pv.Plotter(off_screen=off_screen)
-#     p.add_volume(image_data, **kwargs)
-
-#     return p
-
-
-# def volume_clip_plane(dataset, grid, off_screen=False, **kwargs):
-#     """Create a volume clip plane plot from pyvista."""
-#     image_data = create_imagedata(dataset, grid)
-
-#     p = pv.Plotter(off_screen=off_screen)
-#     p.add_volume_clip_plane(image_data, **kwargs)
-
-#     return p
+    return wrapper

@@ -14,7 +14,16 @@ and this project adheres to
 Initiate the package.
 
 Added
-~~~~~
+^^^^^^
 
-- Add ``mayavi`` image plane widget plot.
-- Add ``pyvista`` volume plot. 
+Mayavi
+~~~~~~
+
+- ``mayavi_image_plane`` for 3D mayavi plotting.
+
+PyVista
+~~~~~~~
+
+- ``pv_imagedata`` for creating the PyVista image data format.
+- ``pv_plot_present`` for plotting PyVista style presets.
+- ``VolumePreset_tab20b`` offset class that's used in the mrfmsim paper.

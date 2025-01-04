@@ -37,22 +37,3 @@ def mayavi_image_plane(dataset, grid, size=(600, 600), **kwargs):
     mlab.colorbar(orientation="vertical")
 
     return mlab
-
-
-def mayavi_save(func):
-    """Decorator to save the plot to a file directly.
-    
-    A decorator is used because the offscreen option needs to be set before
-    the mlab object is created. The decorator adds a keyword filename argument
-    to the plotting function.
-    """
-
-    def wrapper(*args, filename, **kwargs):
-        mlab.options.offscreen = True
-        mlab_obj = func(*args, **kwargs)
-
-        mlab_obj.savefig(filename)
-        mlab_obj.close()
-        mlab.options.offscreen = False
-
-    return wrapper

@@ -12,96 +12,99 @@ uses ``trame`` as the backend, which is slower than ``mayavi``'s native interact
 Installation
 ------------
 
-Both ```mayavi`` and ``pyvista`` packages require the VTK package. To install the latest version of 
-vtk, download the `latest wheels <https://pypi.org/project/vtk/#files>`_ from PYPI based on the 
-operating system and Python version. Then install the wheel using pip (for example, for arm macOS 
-with python 3.10), download the file "vtk-9.3.0-cp311-cp311-macosx_11_0_arm64.whl" and install
-the file using pip:
-
-.. code-block:: bash
-
-   pip install vtk-9.3.0-cp311-cp311-macosx_11_0_arm64.whl
-
-Note the Python requirement for this package is 3.10 and the vtk versions tested are
-9.2.6 and 9.3.0.
-
-To install the mrfmsim-plot package, clone the repository and install using pip::
+Both ``mayavi`` and ``pyvista`` packages require the VTK package.
+The VTK package can be installed with pip and it is included in pyvista.
+The package should work with ``pyvista`` by default::
 
    pip install .
+
+The ``mayavi`` package, however, is very difficult to work with due to
+build and dependency issues. Therefore the installation is optional. To install
+mayavi packages::
+
+   pip install .[mayavi]
+
+It is recommended to manually install the dependency for mayavi. To do that first
+install the vtk package (version 9.3.1) using pip::
+
+   pip install vtk==9.3.1
+
+Then install the mayavi package (with a fresh build)::
+
+   pip install mayavi==4.8.2 --no-cache-dir --verbose  --no-build-isolation
+
+Lastly install the pyqt5 package::
+
+   pip install pyqt5==5.15.11
 
 Usage
 -----
 
-The *mrfmsim-plot* does not provide a unified interface for the Mayavi and PyVista packages due
-to their different vtk implementations. Currently, this package provides two pre-build plotting
-method --- Mayavi scalar field with sliding plane widget and PyVista volume plots. In addition,
-we provide a simple conversion function for `mrfmsim.Grid` object to `pyvista.ImageData` object.
-Both package provide the decorator `mayavi_save` and `pyvista_save` for offscreen rendering and
-save the images to files. Users are encouraged to explore the codebase and create their own plotting
-functions with the two packages.
+The *mrfmsim-plot* provides some basic interaction with the Mayavi and PyVista packages.
+The behaviors of the two modules are different because of very different ploting implementations.
 
-The entry point for the package is designed to include all functions in the "mayaviplots" and
-"pyvistaplots" modules. The functions are named with `mayavi_` and `pv_` prefixes to indicate the
-origin of the function. 
-
-.. code-block:: python
-
-   from mrfmsim.plot import mayavi_image_plane, pv_volume
-
-
-Mayavi
-~~~~~~~~~~~~~~~~~~~
-
-Given a `mrfmsim.Grid` object `grid` and data array `dataset` with the same dimensions,
-to plot the scalar plot with three sliding plane widgets
+For the Mayavi package, a pre-defined 3D plotting function ``mayavi_image_plane`` is provided.
+To plot a dataset, the original ``mrfmsim.Grid`` object and the data array are required.
 
 .. code-block:: python
 
    from mrfmsim.plot import mayavi_image_plane
 
-   p = mayavi_scalar_field(grid, dataset)
-   p.show()
+   mplot = mayavi_image_plane(dataset, grid)
+   mplot.show()
 
-Use the `mayavi_save` decorator to wrap the plot function to save the image to file
-the decorator adds a filename keyword argument to the function. The decorator can
-be used with `@` syntax sugar to decorate a new function definition.
+To save the image without rendering the window,
 
 .. code-block:: python
 
-   from mrfmsim.plot import mayavi_save
+   from mayavi import mlab
+   from mrfmsim.plot import mayavi_image_plane
 
-   mayavi_image_plane_save = mayavi_save(mayavi_image_plane)
-   mayavi_image_plane_save(grid, dataset, filename=filename)
+   mlab.options.offscreen = True
+   mplot = mayavi_image_plane(dataset, grid)
+   mplot.savefig(filename)
+   mplot.close()
+   ## turn the screen back on
+   # mlab.options.offscreen = False
 
-
-PyVista
-~~~~~~~~~~~~~~~~~~~~
-
-Given a `mrfmsim.Grid` object `grid` and data array `dataset` with the same dimensions,
-to plot the volume plot
-
-.. code-block:: python
-
-   from mrfmsim.plot import pv_volume
-
-   p = pv_volume(grid, dataset, name='new_data')
-   p.show()
-
-Use the `pv_save` decorator to wrap the plot function to save the image to file
-the decorator adds a filename keyword argument to the function. The decorator can
-be used with `@` syntax sugar to decorate a new function definition.
+For the PyVista package, because the plotting and the additional settings are additive, we
+provide style presets and a function ``pv_plot_present`` that can plot the preset.
+For the detailed preset settings, please refer to the "pvplot.py" file.
 
 .. code-block:: python
 
-   from mrfmsim.plot import pv_save
+   from mrfmsim.pvplot import pv_plot_present, VolumePreset_tab20b
 
-   pv_volume_save = pyvista_save(pv_volume)
-   pv_volume_save(grid, dataset, name='new_data', filename=filename)
+   present = VolumePreset_tab20b(dataset, grid)
+   pl = pv_plot_present(present)
+   pl.show()
 
-In addition, we provide the function that convert the `mrfmsim.Grid` object to `pyvista.ImageData`
+The preset is a dictionary class. Changes can be made to the preset dictionary
+directly or add keyward arguments during the present initialization.
 
 .. code-block:: python
 
-   from mrfmsim.plot import pv_imagedata
+   from mrfmsim.pvplot import pv_plot_present, VolumePreset_tab20b
 
-   image_data = pv_imagedata(dataset, grid)
+   present = VolumePreset_tab20b(dataset, grid, window_size=(800, 800))
+   del present['add_axes'] # remove the axes
+   pl = pv_plot_present(present)
+   pl.show()
+
+Similar, to save the plot, we need to turn off the interactive window.
+
+.. code-block:: python
+
+   from mrfmsim.pvplot import pv_plot_present, VolumePreset_tab20b
+   import pyvista as pv
+   
+   pv.OFF_SCREEN = True
+   present = VolumePreset_tab20b(dataset, grid)
+   pl = pv_plot_present(present)
+   
+   # ``.screenshot`` method can also be used, check the pyvista documentation
+   # for more details.
+   pl.save_graphic(filename, ...)
+
+   # turn the screen back on
+   # pv.OFF_SCREEN = False

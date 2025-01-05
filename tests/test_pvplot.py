@@ -1,5 +1,5 @@
 import pyvista as pv
-from mrfmsim_plot.pvplot import pv_imagedata, pv_plot_preset, VolumePreset_tab20b
+from mrfmsim_plot.pvplot import pv_imagedata, pv_plot_preset, pv_preset_volume_tab20b
 import numpy as np
 
 
@@ -28,7 +28,7 @@ class TestImageData:
 def test_pv_plot_preset(dataset, grid):
     """Test the pv_volume function."""
 
-    preset = VolumePreset_tab20b(dataset, grid)
+    preset = pv_preset_volume_tab20b(dataset, grid)
     p = pv_plot_preset(preset)
 
     assert p.renderers[0].background_color == "whitesmoke"
@@ -38,7 +38,7 @@ def test_pv_plot_preset(dataset, grid):
 def test_pv_preset_changes(dataset, grid):
     """Test if the preset changes the plot correctly."""
 
-    preset = VolumePreset_tab20b(dataset, grid)
+    preset = pv_preset_volume_tab20b(dataset, grid)
     del preset["add_axes"]
     p = pv_plot_preset(preset)
 

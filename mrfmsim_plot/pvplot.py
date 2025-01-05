@@ -45,28 +45,27 @@ def pv_plot_preset(preset):
     return p
 
 
-class VolumePreset_tab20b(UserDict):
-    """Preset tab20b color scheme for the plot used in the mrfmsim paper."""
+def pv_preset_volume_tab20b(dataset, grid, name="data", **kwargs):
+    """Create a preset for volume rendering with tab20b colormap."""
 
-    def __init__(self, dataset, grid, name="data", **kwargs):
+    image_data = pv_imagedata(dataset, grid, name)
+    preset_params = {
+        "add_volume": {
+            "volume": image_data,
+            "cmap": "tab20b",
+            "opacity": "linear",
+            "show_scalar_bar": False,
+        },
+        "background_color": "whitesmoke",
+        "window_size": (512, 768),
+        "add_scalar_bar": {
+            "title": name,
+            "vertical": True,
+            "position_x": 0.8,
+            "position_y": 0.3,
+        },
+        "add_axes": {},
+    }
 
-        image_data = pv_imagedata(dataset, grid, name)
-        self.data = {
-            "add_volume": {
-                "volume": image_data,
-                "cmap": "tab20b",
-                "opacity": "linear",
-                "show_scalar_bar": False,
-            },
-            "background_color": "whitesmoke",
-            "window_size": (512, 768),
-            "add_scalar_bar": {
-                "title": name,
-                "vertical": True,
-                "position_x": 0.8,
-                "position_y": 0.3,
-            },
-            "add_axes": {},
-        }
-
-        self.data.update(kwargs)
+    preset_params.update(kwargs)
+    return preset_params

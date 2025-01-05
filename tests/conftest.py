@@ -17,5 +17,5 @@ def grid():
     is [-45, 55, -40, 60, -15, 5].
     """
 
-    grid = Grid(shape=(11, 21, 21), step=[10, 5, 1], origin=[5, 10, -5])
+    grid = Grid(grid_shape=(11, 21, 21), grid_step=[10, 5, 1], grid_origin=[5, 10, -5])
     return grid

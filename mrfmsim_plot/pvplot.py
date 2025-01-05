@@ -12,9 +12,13 @@ def pv_imagedata(dataset, grid, name="data"):
     """
 
     image_data = pv.ImageData()
-    image_data.dimensions = grid.shape
-    image_data.origin = [grid.extents[0][0], grid.extents[1][0], grid.extents[2][0]]
-    image_data.spacing = grid.step
+    image_data.dimensions = grid.grid_shape
+    image_data.origin = [
+        grid.grid_extents[0][0],
+        grid.grid_extents[1][0],
+        grid.grid_extents[2][0],
+    ]
+    image_data.spacing = grid.grid_step
 
     # pyvsita sets the grid up as the F order, different from the mgrid
     # default generation

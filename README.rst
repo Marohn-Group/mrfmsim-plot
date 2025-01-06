@@ -29,7 +29,8 @@ install the vtk package (version 9.3.1) using pip::
 
    pip install vtk==9.3.1
 
-Then install the mayavi package (with a fresh build)::
+Then install the mayavi package (with a fresh build, and currently only supports
+up to numpy 1.26.4)::
 
    pip install mayavi==4.8.2 --no-cache-dir --verbose  --no-build-isolation
 

@@ -13,6 +13,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10"
 mrfmsim = { git = "https://github.com/marohn-group/mrfmsim", branch="feature" }
+numpy = "==1.26.4"
 pyvista = "==0.44.2"
 ipywidgets = ">=8.1.1"
 colorcet = ">=3.0.0"

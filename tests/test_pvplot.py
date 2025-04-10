@@ -1,5 +1,4 @@
-import pyvista as pv
-from mrfmsim_plot.pvplot import pv_imagedata, pv_plot_preset, pv_preset_volume_tab20b
+from mrfmsim_plot.pvplot import pv_imagedata, pv_plot_preset, pv_preset_volume
 import numpy as np
 
 
@@ -25,21 +24,75 @@ class TestImageData:
         assert image_data.active_scalars_name == "new_name"
 
 
+def test_pv_preset_volume(dataset, grid):
+    """Test if pv_preset_volume returns the correct preset dictionary."""
+
+    preset = pv_preset_volume(dataset, grid)
+
+    # Check if the preset contains all expected keys
+    expected_keys = ["add_volume", "window_size", "add_scalar_bar", "add_axes"]
+    for key in expected_keys:
+        assert key in preset
+
+    # Check volume settings
+    assert preset["add_volume"]["volume"].active_scalars_name == "data"
+    assert preset["add_volume"]["clim"] == [dataset.min(), dataset.max()]
+    assert preset["add_volume"]["cmap"] == "viridis"
+    assert preset["add_volume"]["opacity"] == 0.8
+    assert preset["add_volume"]["show_scalar_bar"] == False
+
+    # Test with custom parameters
+    custom_preset = pv_preset_volume(
+        dataset,
+        grid,
+        name="custom_data",
+        add_volume={"cmap": "plasma", "opacity": 0.5},
+        window_size=[800, 600],
+    )
+
+    assert custom_preset["add_volume"]["cmap"] == "plasma"
+    assert custom_preset["add_volume"]["opacity"] == 0.5
+    assert custom_preset["window_size"] == [800, 600]
+    assert custom_preset["add_volume"]["volume"].active_scalars_name == "custom_data"
+
+
 def test_pv_plot_preset(dataset, grid):
-    """Test the pv_volume function."""
+    """Test if pv_plot_preset correctly applies preset parameters."""
 
-    preset = pv_preset_volume_tab20b(dataset, grid)
-    p = pv_plot_preset(preset)
+    # Create a simple preset dictionary
+    preset = {
+        "window_size": [400, 300],
+        "add_axes": {},
+        "add_text": {"text": "Test", "position": "upper_left"},
+    }
 
-    assert p.renderers[0].background_color == "whitesmoke"
-    assert p.renderers[0].axes_enabled
+    # Create plotter with preset
+    plotter = pv_plot_preset(preset)
 
+    # Check if the preset parameters were applied
+    assert plotter.window_size == [400, 300]
 
-def test_pv_preset_changes(dataset, grid):
-    """Test if the preset changes the plot correctly."""
+    # Test with more complex parameters
+    complex_preset = {
+        "window_size": [800, 600],
+        "add_axes": {"xlabel": "X", "ylabel": "Y", "zlabel": "Z"},
+        "background_color": "white",
+    }
 
-    preset = pv_preset_volume_tab20b(dataset, grid)
-    del preset["add_axes"]
-    p = pv_plot_preset(preset)
+    complex_plotter = pv_plot_preset(complex_preset)
+    assert complex_plotter.window_size == [800, 600]
+    assert complex_plotter.background_color == "white"
 
-    assert not p.renderers[0].axes_enabled
+    # Test method calls with dictionaries
+    image_data = pv_imagedata(dataset, grid, name="data")
+    preset = {
+        "add_volume": {"volume": image_data, "opacity": 0.7},
+        "add_scalar_bar": {"title": "Test Bar", "n_labels": 3},
+    }
+
+    # This should call the methods without errors
+    plotter = pv_plot_preset(preset)
+    scalar_bar_actor = plotter.scalar_bars["Test Bar"]
+    # Test number of labels - VTK uses GetNumberOfLabels() method
+    assert scalar_bar_actor.GetNumberOfLabels() == 3
+    assert scalar_bar_actor.GetTitle() == "Test Bar"

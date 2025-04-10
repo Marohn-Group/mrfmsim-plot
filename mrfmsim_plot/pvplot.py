@@ -45,27 +45,38 @@ def pv_plot_preset(preset):
     return p
 
 
-def pv_preset_volume_tab20b(dataset, grid, name="data", **kwargs):
-    """Create a preset for volume rendering with tab20b colormap."""
+def pv_preset_volume(dataset, grid, name="data", **kwargs):
+    """Create a preset for volume rendering.
+
+    The keyword arguments are dictionary, and the content
+    is updated to the present dictionary.
+    """
 
     image_data = pv_imagedata(dataset, grid, name)
+
     preset_params = {
         "add_volume": {
             "volume": image_data,
-            "cmap": "tab20b",
-            "opacity": "linear",
+            "clim": [dataset.min(), dataset.max()],
+            "cmap": "viridis",
+            "opacity": 0.8,
             "show_scalar_bar": False,
         },
-        "background_color": "whitesmoke",
         "window_size": (512, 768),
         "add_scalar_bar": {
-            "title": name,
+            "title": "Data",
             "vertical": True,
             "position_x": 0.8,
             "position_y": 0.3,
+            "fmt": "%.2e",
+            "n_labels": 5,
         },
         "add_axes": {},
     }
 
-    preset_params.update(kwargs)
+    for key, value in kwargs.items():
+        if key in preset_params and isinstance(preset_params[key], dict):
+            preset_params[key].update(value)
+        else:
+            preset_params[key] = value
     return preset_params

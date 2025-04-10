@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mrfmsim-plot"
-version = "0.1.0"
+version = "0.1.1"
 description = "Plotting functions for magnetic resonance force microscopy experiments"
 authors = ["Peter Sun <hs859@cornell.edu>"]
 maintainers = ["Peter Sun <hs859@cornell.edu>"]
@@ -12,11 +12,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10"
-mrfmsim = { git = "https://github.com/marohn-group/mrfmsim", branch="feature" }
 numpy = "==1.26.4"
 pyvista = "==0.44.2"
-ipywidgets = ">=8.1.1"
-colorcet = ">=3.0.0"
 vtk = { version = "==9.3.1", optional = true }
 mayavi = { version = "==4.8.2", optional = true }
 pyqt5 = { version = "==5.15.11", optional = true }

@@ -8,6 +8,15 @@ and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_
 
 
+[0.1.1]
+--------------
+
+Changed
+^^^^^^^
+
+- Changed the preset to match the paper and allow for more flexible modification.
+
+
 [0.1.0]
 --------------
 
